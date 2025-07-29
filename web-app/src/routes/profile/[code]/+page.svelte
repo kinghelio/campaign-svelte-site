@@ -6,12 +6,16 @@
 
     // --- State for Profile Data ---
     let experienceText = '';
+    let savedExperienceText = ''; // For displaying the confirmed saved value
     let saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
     let debounceTimer: NodeJS.Timeout;
 
     // Initialize local state when component mounts
+    // Initialize local state when component mounts
     onMount(() => {
-        experienceText = data.profile?.experienceText || '';
+        const initialText = data.profile?.experienceText || '';
+        experienceText = initialText;
+        savedExperienceText = initialText;
         saveStatus = 'saved';
     });
 
@@ -49,25 +53,35 @@
     {#if data.profile}
         <h1>Profile: {data.profile.name}</h1>
 
-        <div class="card">
-            <div class="header">
-                <h2>Experience Notes</h2>
-                <div class="status {saveStatus}">
+        <div class="card">            
+            <h3>Current Exp</h3>{savedExperienceText}
+                        
+            <input
+                type="text"
+                class="experience-input"
+                placeholder="Enter your current experience here..."
+                bind:value={experienceText}
+                on:input={triggerSave}
+            />
+         </div>
+         <div class="card">            
+            <h3>Current Points</h3>{savedExperienceText}
+                        
+            <input
+                type="text"
+                class="points-input"
+                placeholder="Enter your current points here..."
+                bind:value={pointsText}
+                on:input={triggerSave}
+            />
+         </div>
+
+        <div class="status {saveStatus}">
                     {#if saveStatus === 'idle'}Idle...{/if}
                     {#if saveStatus === 'saving'}Saving...{/if}
                     {#if saveStatus === 'saved'}✓ All changes saved{/if}
                     {#if saveStatus === 'error'}✗ Error saving{/if}
                 </div>
-            </div>
-
-            <textarea
-                class="experience-box"
-                placeholder="Enter your experience notes here..."
-                bind:value={experienceText}
-                on:input={triggerSave}
-            ></textarea>
-
-        </div>
 
     {:else if data.error}
         <div class="card error">
@@ -87,16 +101,23 @@
     .status.saving { color: #007bff; }
     .status.saved { color: #28a745; }
     .status.error { color: #dc3545; }
-    .experience-box {
+    .display-box {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 4px;
+        min-height: 40px; /* Adjusted min-height */
+        white-space: pre-wrap; /* Preserves whitespace and line breaks */
+        word-wrap: break-word;
+    }
+    .experience-input {
         width: 100%;
-        min-height: 250px;
         padding: 10px;
         border-radius: 4px;
         border: 1px solid #ccc;
         box-sizing: border-box;
         font-family: inherit;
         font-size: 1rem;
-        resize: vertical;
     }
     a { display: inline-block; margin-top: 20px; }
 </style>
